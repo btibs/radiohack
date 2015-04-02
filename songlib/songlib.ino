@@ -1,13 +1,4 @@
-/*
- http://arduino.cc/en/Tutorial/Tone
- note that the tone function does not allow volume control
- solution being to write our own with analog out
-*/
-//#include "pitches.h"
-/*************************************************
- * Public Constants
- *************************************************/
-
+// note frequencies
 #define NOTE_B0  31
 #define NOTE_C1  33
 #define NOTE_CS1 35
@@ -102,31 +93,29 @@ int nSongs = 7;
 
 // notes
 int melodies[][78] = {
-  // default
-  { //NOTE_C4, NOTE_G3,NOTE_G3, NOTE_A3, NOTE_G3,0, NOTE_B3, NOTE_C4
-  NOTE_C4, NOTE_C4,NOTE_C4, NOTE_C4, NOTE_C4, NOTE_C4, NOTE_C4, NOTE_C4
+  //0 testing
+  { NOTE_C4, NOTE_C4, NOTE_C4, NOTE_C4, NOTE_C4 },
+  //1 Happy Birthday - nope
+  { NOTE_C4,NOTE_C4,NOTE_D4,NOTE_C4,NOTE_F4,NOTE_E4, NOTE_C4,NOTE_C4,NOTE_D4,NOTE_C4,NOTE_G4,NOTE_F4, NOTE_C4,NOTE_C4,NOTE_C5,NOTE_A4,NOTE_F4,NOTE_E4,NOTE_D4, NOTE_AS4,NOTE_AS4,NOTE_A4,NOTE_F4,NOTE_G4,NOTE_F4
   },
-  // Happy Birthday
-  { NOTE_C4,NOTE_C4,NOTE_D4,NOTE_C4,NOTE_F4,NOTE_E4, NOTE_C4,NOTE_C4,NOTE_D4,NOTE_C4,NOTE_G4,NOTE_F4, NOTE_C4,NOTE_C4,NOTE_C5,NOTE_A4,NOTE_F4,NOTE_E4,NOTE_D4, NOTE_AS4,NOTE_AS4,NOTE_A4,NOTE_F4,NOTE_G4,NOTE_F4   
-  },
-  // Gangnam Style
+  //2 Gangnam Style
   { NOTE_A4,NOTE_A4,NOTE_C5,0,NOTE_A4,0,NOTE_E5,NOTE_E5,NOTE_E5,0,NOTE_D5,0, NOTE_D5,NOTE_D5,NOTE_E5,0,0,NOTE_E5,NOTE_E5,NOTE_E5,NOTE_E5,0,0, NOTE_E5,NOTE_E5,NOTE_E5,NOTE_E5,NOTE_E5,NOTE_E5,NOTE_E5,NOTE_E5,NOTE_E5,NOTE_E5,NOTE_E5,NOTE_E5,NOTE_E5,NOTE_E5,NOTE_E5,NOTE_E5,NOTE_E5, NOTE_E5,NOTE_E5,NOTE_E5,NOTE_E5,NOTE_E5,NOTE_E5,NOTE_E5,NOTE_E5,NOTE_E5,NOTE_E5,NOTE_E5,NOTE_E5,NOTE_E5,NOTE_E5,NOTE_E5,0,0, NOTE_A4,NOTE_A4,NOTE_C5,NOTE_C5,NOTE_A4,0,0
   },
-  // Star Wars Imperial March
+  //3 Star Wars Imperial March ??
   {  NOTE_A4, 0,  NOTE_A4, 0,  NOTE_A4, 0,  NOTE_F4, 0, NOTE_C5, 0,  NOTE_A4, 0,  NOTE_F4, 0, NOTE_C5, 0, NOTE_A4, 0,  NOTE_E5, 0,  NOTE_E5, 0,  NOTE_E5, 0,  NOTE_F5, 0, NOTE_C5, 0,  NOTE_G5, 0,  NOTE_F5, 0,  NOTE_C5, 0, NOTE_A4, 0},
-  // Star Wars theme
+  //4 Star Wars theme  ?????
   {  NOTE_F4,  NOTE_F4, NOTE_F4,  NOTE_AS4,   NOTE_F5,  NOTE_DS5,  NOTE_D5,  NOTE_C5, NOTE_AS5, NOTE_F5, NOTE_DS5,  NOTE_D5,  NOTE_C5, NOTE_AS5, NOTE_F5, NOTE_DS5, NOTE_D5, NOTE_DS5,   NOTE_C5},
-  // Mario
+  //5 Mario
   { NOTE_E7, NOTE_E7, 0, NOTE_E7, 0, NOTE_C7, NOTE_E7, 0, NOTE_G7, 0, 0,  0, NOTE_G6, 0, 0, 0, NOTE_C7, 0, 0, NOTE_G6, 0, 0, NOTE_E6, 0, 0, NOTE_A6, 0, NOTE_B6, 0, NOTE_AS6, NOTE_A6, 0, NOTE_G6, NOTE_E7, NOTE_G7, NOTE_A7, 0, NOTE_F7, NOTE_G7, 0, NOTE_E7, 0, NOTE_C7, NOTE_D7, NOTE_B6, 0, 0, NOTE_C7, 0, 0, NOTE_G6, 0, 0, NOTE_E6, 0, 0, NOTE_A6, 0, NOTE_B6, 0, NOTE_AS6, NOTE_A6, 0, NOTE_G6, NOTE_E7, NOTE_G7, NOTE_A7, 0, NOTE_F7, NOTE_G7, 0, NOTE_E7, 0, NOTE_C7, NOTE_D7, NOTE_B6, 0, 0
   },
-  // Mario Underworld Melody
+  //6 Mario Underworld Melody
   { NOTE_C4, NOTE_C5, NOTE_A3, NOTE_A4, NOTE_AS3, NOTE_AS4, 0, 0, NOTE_C4, NOTE_C5, NOTE_A3, NOTE_A4, NOTE_AS3, NOTE_AS4, 0, 0, NOTE_F3, NOTE_F4, NOTE_D3, NOTE_D4, NOTE_DS3, NOTE_DS4, 0, 0, NOTE_F3, NOTE_F4, NOTE_D3, NOTE_D4, NOTE_DS3, NOTE_DS4, 0, 0, NOTE_DS4, NOTE_CS4, NOTE_D4, NOTE_CS4, NOTE_DS4, NOTE_DS4, NOTE_GS3, NOTE_G3, NOTE_CS4, NOTE_C4, NOTE_FS4, NOTE_F4, NOTE_E3, NOTE_AS4, NOTE_A4, NOTE_GS4, NOTE_DS4, NOTE_B3, NOTE_AS3, NOTE_A3, NOTE_GS3, 0, 0, 0
   },
 };
 
 // durations
 int noteDurations[][78] = {
-  {4,4,4,4,4,4,4,4 },
+  {4,4,4,4,4},
   {
     6,12,4,4,4,2,
     6,12,4,4,4,2,
@@ -193,7 +182,7 @@ int noteDurations[][78] = {
 
 // total notes
 int total[] = {
-  8,
+  5,
   25,
   64,
   36,
@@ -208,12 +197,12 @@ int nLeds = sizeof(ledPins) / sizeof(int);
 
 // inputs from radio potentiometers
 int freqPin = A0;
-int freqMax = 300;
+int freqMax = 296;
 int freqMin = 110;
 
 int volPin = A1;
 int volMax = 310;
-int volMin = 150;
+int volMin = 101;
 
 void setup() {
   for (int i=0; i<nLeds; i++) {
@@ -230,24 +219,21 @@ void setup() {
 void loop() {
   // play all the songs in order
   for (int song = 0; song < nSongs; song++) {
-    song = 6;
     for (int thisNote = 0; thisNote < total[song]; thisNote++){
-      //thisNote = 7;
       int freqVal = analogRead(freqPin);
       int volVal = analogRead(volPin);
-      Serial.print(freqVal);
-      Serial.print(" ");
       // 1 second / note type
-      //int timeChange = map(volVal, volMin, volMax, -5, 5); // higher = faster
-      //int timeChange = 0;
-      int timeChange = map(freqVal, freqMin, freqMax, -5, 5);
-      
+      double timeChange = map(volVal, volMin, volMax, -3, 3); // higher = faster
+      Serial.print(" ");
+      Serial.print(timeChange);
+      //timeChange=0;
       int noteDuration = 1000/(noteDurations[song][thisNote] + timeChange);
-      Serial.println(noteDuration);
       
-      //int freqChange = map(freqVal, freqMin, freqMax, -20, 20);
-      int freqChange = 0;
-      Serial.println(freqChange);
+      int freqChange = map(freqVal, freqMin, freqMax, -20, 20);
+      Serial.print(" ");
+      Serial.print(freqChange);
+      Serial.println();
+      //freqChange=0;
       buzz(speakerPin, melodies[song][thisNote] + freqChange, noteDuration);
       
       // flash LEDs
@@ -269,7 +255,7 @@ void loop() {
       }
     }
     // pause before the next song
-    delay(1000);
+    delay(500);
   }
 }
 
