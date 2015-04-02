@@ -18,7 +18,7 @@ void draw(){
 
 void serialEvent (Serial myPort) {
   String inString = calculatorPort.readStringUntil('\n');
-
+  
   if (inString != null) {
   }
 }

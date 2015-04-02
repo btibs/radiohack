@@ -15,6 +15,10 @@ int highCount[SIG_NUM];
 int pointer = 0;
 char prepKey[] = {'n', 'n', 'n'};
 char currentKey = 'n';
+int currentInt = -1;
+int preInt = -1;
+int postInt = -1;
+char calOperator = 'n';
 
 void setup() {
   resetSignals();
@@ -27,6 +31,7 @@ void loop() {
   dataUpdate();
   
   currentKey = 'n';
+  currentInt = -1;
   if(pointer == SIG_LENGTH - 1){
     for(int i=0; i<SIG_NUM; i++){
       showButtonEvent(i);
@@ -63,32 +68,65 @@ void showButtonEvent(int index){
   //Serial.print(ratio);
   
   if (index == E_07){
-    if (ratio > 0.15 && ratio < 0.35) currentKey = '7';
-    else if (ratio > 0.4 && ratio < 0.6) currentKey = '=';
-    else if (ratio > 0.65 && ratio < 0.85) currentKey = '0';
+    if (ratio > 0.15 && ratio < 0.35) {
+      currentKey = '7';
+      currentInt = 7;
+    }
+    else if (ratio > 0.4 && ratio < 0.6) {
+      currentKey = '=';
+      currentInt = -1;
+    }
+    //else if (ratio > 0.4 && ratio < 0.6) currentKey = '0';
   } 
   
   else if ( index == X_148){
-    if (ratio > 0.15 && ratio < 0.35) currentKey = '8';
-    else if (ratio > 0.4 && ratio < 0.6) currentKey = '1';
-    else if (ratio > 0.65 && ratio < 0.85) currentKey = '4';
+    if (ratio > 0.15 && ratio < 0.35) {
+      currentKey = '8';
+      currentInt = 8;
+    }
+    else if (ratio > 0.4 && ratio < 0.6) {
+      currentKey = '1';
+      currentInt = 1;
+    }
+    else if (ratio > 0.65 && ratio < 0.85) {
+      currentKey = '4';
+      currentInt = 4;
+    }
   } 
   
   else if ( index == D_259){
-    if (ratio > 0.15 && ratio < 0.35) currentKey = '9';
-    else if (ratio > 0.4 && ratio < 0.6) currentKey = '2';
-    else if (ratio > 0.65 && ratio < 0.85) currentKey = '5';
+    if (ratio > 0.15 && ratio < 0.35) {
+      currentKey = '9';
+      currentInt = 9;
+    }
+    else if (ratio > 0.4 && ratio < 0.6) {
+      currentKey = '2'; // divide
+      currentInt = 2;
+    }
+    else if (ratio > 0.65 && ratio < 0.85) {
+      currentKey = '5';
+      currentInt = 5;
+    }
   } 
   
   else if ( index == MSP_36){
     float powerFreq = (float)highCount[POWER_X] / (float)SIG_LENGTH;
-    if (ratio > 0.15 && ratio < 0.35) currentKey = '-';
-    else if (ratio > 0.4 && ratio < 0.6) currentKey = '3';
-    else if (ratio > 0.65 && ratio < 0.85) currentKey = '6';
+    if (ratio > 0.15 && ratio < 0.35) {
+      currentKey = '-';
+      currentInt = -1;
+    }
+    else if (ratio > 0.4 && ratio < 0.6) {
+      currentKey = '3'; // x
+      currentInt = 3;
+    }
+    else if (ratio > 0.65 && ratio < 0.85) {
+      currentKey = '6'; // +
+      currentInt = 6;
+    }
   } 
   
   else if ( index == PERIOD_X){
-    if (ratio > 0.15) Serial.println('.');
+   // if (ratio > 0.5) currentKey = '.';
   } 
 }
 
@@ -107,7 +145,40 @@ void matchButtons(char currentKey){
   
   if (match){
     if(currentKey != 'n'){
-      if (printButton) Serial.println(currentKey);
+      if (printButton) {
+        //Serial.println(currentKey);
+        if (preInt == -1){
+          if (currentInt != -1) preInt = currentInt;
+        }else if (calOperator == 'n') {
+          if (currentInt == 6) calOperator = '+';
+          else if (currentInt == 3) calOperator = 'x';
+          else if (currentInt == 2) calOperator = 'd';
+          else if (currentKey == '-') calOperator = '-';
+        }else if (postInt == -1){
+          if (currentInt != -1) postInt = currentInt;
+        }else{
+          if(currentKey == '='){
+            float signal = -1;
+            if (calOperator == '+') signal = preInt + postInt;
+            else if (calOperator == '-') signal = preInt - postInt;
+            else if (calOperator == 'x') signal = preInt * postInt;
+            else if (calOperator == 'd') signal = (float)preInt / (float)postInt;
+            
+            //send signal
+            //Serial.println(signal);
+            preInt = -1;
+            postInt = -1;
+            calOperator = 'n';
+          }
+        }
+        
+        Serial.print(preInt);
+        Serial.print(',');
+        Serial.print(calOperator);
+        Serial.print(',');
+        Serial.println(postInt);
+      }
+      
       for(int i = 0; i<HISTORY_LENGTH; i++){
         prepKey[i] = 'n';    
       }
