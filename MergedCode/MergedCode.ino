@@ -99,12 +99,12 @@
 #define NOTE_DS8 4978
 
 
-#define E_07 0
-#define X_148 1
-#define D_259 2
-#define MSP_36 3
-#define PERIOD_X 4
-#define POWER_X 5
+#define E_07 3
+#define X_148 4
+#define D_259 5
+#define MSP_36 6
+#define PERIOD_X 7
+#define POWER_X 8
 
 #define SIG_NUM 5
 #define SIG_LENGTH 30
@@ -223,11 +223,11 @@ int ledPins[] = {4,5,6,7};
 int nLeds = sizeof(ledPins) / sizeof(int);
 
 // inputs from radio potentiometers
-int freqPin = A5;
+int freqPin = A0;
 int freqMax = 296;
 int freqMin = 110;
 
-int volPin = A6;
+int volPin = A1;
 int volMax = 310;
 int volMin = 101;
 
@@ -247,14 +247,10 @@ int postInt = -1;
 char calOperator = 'n';
 
 void setup() {
-  Serial.begin(115200);
+  Serial.begin(9600);
   Serial.println("Serial Start");
   
   //radio code start
-  for (int i=0; i<nLeds; i++) {
-    pinMode(ledPins[i], OUTPUT);
-    digitalWrite(ledPins[i], LOW);
-  }
   pinMode(freqPin, INPUT);
   pinMode(volPin, INPUT);
   pinMode(speakerPin, OUTPUT);
@@ -268,61 +264,28 @@ void setup() {
 
 long prevCalcLoopTime = -1;
 long prevRadioLoopTime = -1;
-int song = 0;
+int song = 5;
 int thisNote = 0;
 boolean radioStop = false;
 void loop() {
-  //calculator code start
-  
-  if (millis() - prevCalcLoopTime > 1){
-    dataUpdate();
-    
-    currentKey = 'n';
-    currentInt = -1;
-    if(pointer == SIG_LENGTH - 1){
-      for(int i=0; i<SIG_NUM; i++){
-        showButtonEvent(i);
-      }
-      
-      matchButtons(currentKey);
-    }
-    
-    
-    pointer++;
-    if(pointer >= SIG_LENGTH) {
-      pointer = 0;
-      resetSignals();
-    }
-    prevCalcLoopTime = millis();
-    //Serial.println("....");
-  }
-  //calculator code end  
-  
-  
-  Serial.println("Loop start");
-  
   // radio code start
   int freqVal = analogRead(freqPin);
   int volVal = analogRead(volPin);
-  Serial.print(freqVal);
-  Serial.print(" ");
+  //Serial.print(freqVal);
+  //Serial.print(" ");
   // 1 second / note type
   //int timeChange = map(volVal, volMin, volMax, -5, 5); // higher = faster
   //int timeChange = 0;
   int timeChange = map(freqVal, freqMin, freqMax, -5, 5);
   
-  int noteDuration = 1000/(noteDurations[song][thisNote] + timeChange);
-  Serial.println(noteDuration);
+  int noteDuration = 1000/(pgm_read_word(&(noteDurations[song][thisNote])) + timeChange);
+  //Serial.println(noteDuration);
   
-  //int freqChange = map(freqVal, freqMin, freqMax, -20, 20);
-  int freqChange = 0;
-  Serial.println(freqChange);
-  buzz(speakerPin, melodies[song][thisNote] + freqChange, noteDuration);
+  int freqChange = map(freqVal, freqMin, freqMax, -50, 50);
+  //int freqChange = 0;
+  //Serial.println(freqChange);
+  buzz(speakerPin, pgm_read_word(&(melodies[song][thisNote])) + freqChange, noteDuration);
   
-  // flash LEDs
-  for (int i=0; i<nLeds; i++) {
-      digitalWrite(ledPins[i], HIGH);
-  }
   
   // to distinguish the notes, set a minimum time between them.
   // the note's duration + 30% seems to work well:
@@ -332,17 +295,17 @@ void loop() {
   // stop the tone playing
   buzz(speakerPin, 0, noteDuration);
   
-  // turn off LEDs
-  for (int i=0; i<nLeds; i++) {
-      digitalWrite(ledPins[i], LOW);
-  }
   
   thisNote++;
-  if(thisNote >= total[song]) {
+  if(thisNote >= total[song]-1) {
     thisNote = 0;
   }  
-  Serial.println("loop end");
   // radio code end
+  if(Serial.available() > 0){
+    song = (int)(Serial.read()-'0');
+    Serial.print(song);
+    Serial.println(",,");
+  }
 }
 
 void resetSignals(){
@@ -529,3 +492,5 @@ void buzz(int targetPin, long frequency, long length) {
   }
   digitalWrite(13, LOW);
 }
+
+ 

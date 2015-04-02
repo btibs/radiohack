@@ -146,7 +146,7 @@ void matchButtons(char currentKey){
   if (match){
     if(currentKey != 'n'){
       if (printButton) {
-        //Serial.println(currentKey);
+        //Serial.println(currentInt);
         if (preInt == -1){
           if (currentInt != -1) preInt = currentInt;
         }else if (calOperator == 'n') {
@@ -158,14 +158,14 @@ void matchButtons(char currentKey){
           if (currentInt != -1) postInt = currentInt;
         }else{
           if(currentKey == '='){
-            float signal = -1;
+            int signal = -1;
             if (calOperator == '+') signal = preInt + postInt;
             else if (calOperator == '-') signal = preInt - postInt;
             else if (calOperator == 'x') signal = preInt * postInt;
             else if (calOperator == 'd') signal = (float)preInt / (float)postInt;
             
             //send signal
-            //Serial.println(signal);
+            Serial.println(signal);
             preInt = -1;
             postInt = -1;
             calOperator = 'n';
@@ -177,6 +177,7 @@ void matchButtons(char currentKey){
         Serial.print(calOperator);
         Serial.print(',');
         Serial.println(postInt);
+        
       }
       
       for(int i = 0; i<HISTORY_LENGTH; i++){

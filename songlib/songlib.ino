@@ -92,30 +92,32 @@
 int nSongs = 7;
 
 // notes
-int melodies[][78] = {
-  //0 testing
-  { NOTE_C4, NOTE_C4, NOTE_C4, NOTE_C4, NOTE_C4 },
-  //1 Happy Birthday - nope
-  { NOTE_C4,NOTE_C4,NOTE_D4,NOTE_C4,NOTE_F4,NOTE_E4, NOTE_C4,NOTE_C4,NOTE_D4,NOTE_C4,NOTE_G4,NOTE_F4, NOTE_C4,NOTE_C4,NOTE_C5,NOTE_A4,NOTE_F4,NOTE_E4,NOTE_D4, NOTE_AS4,NOTE_AS4,NOTE_A4,NOTE_F4,NOTE_G4,NOTE_F4
+const int melodies[][78] PROGMEM = {
+  // default
+  { //NOTE_C4, NOTE_G3,NOTE_G3, NOTE_A3, NOTE_G3,0, NOTE_B3, NOTE_C4
+  NOTE_C4, NOTE_C4,NOTE_C4, NOTE_C4, NOTE_C4, NOTE_C4, NOTE_C4, NOTE_C4
   },
-  //2 Gangnam Style
+  // Happy Birthday
+  { NOTE_C4,NOTE_C4,NOTE_D4,NOTE_C4,NOTE_F4,NOTE_E4, NOTE_C4,NOTE_C4,NOTE_D4,NOTE_C4,NOTE_G4,NOTE_F4, NOTE_C4,NOTE_C4,NOTE_C5,NOTE_A4,NOTE_F4,NOTE_E4,NOTE_D4, NOTE_AS4,NOTE_AS4,NOTE_A4,NOTE_F4,NOTE_G4,NOTE_F4   
+  },
+  // Gangnam Style
   { NOTE_A4,NOTE_A4,NOTE_C5,0,NOTE_A4,0,NOTE_E5,NOTE_E5,NOTE_E5,0,NOTE_D5,0, NOTE_D5,NOTE_D5,NOTE_E5,0,0,NOTE_E5,NOTE_E5,NOTE_E5,NOTE_E5,0,0, NOTE_E5,NOTE_E5,NOTE_E5,NOTE_E5,NOTE_E5,NOTE_E5,NOTE_E5,NOTE_E5,NOTE_E5,NOTE_E5,NOTE_E5,NOTE_E5,NOTE_E5,NOTE_E5,NOTE_E5,NOTE_E5,NOTE_E5, NOTE_E5,NOTE_E5,NOTE_E5,NOTE_E5,NOTE_E5,NOTE_E5,NOTE_E5,NOTE_E5,NOTE_E5,NOTE_E5,NOTE_E5,NOTE_E5,NOTE_E5,NOTE_E5,NOTE_E5,0,0, NOTE_A4,NOTE_A4,NOTE_C5,NOTE_C5,NOTE_A4,0,0
   },
-  //3 Star Wars Imperial March ??
+  // Star Wars Imperial March
   {  NOTE_A4, 0,  NOTE_A4, 0,  NOTE_A4, 0,  NOTE_F4, 0, NOTE_C5, 0,  NOTE_A4, 0,  NOTE_F4, 0, NOTE_C5, 0, NOTE_A4, 0,  NOTE_E5, 0,  NOTE_E5, 0,  NOTE_E5, 0,  NOTE_F5, 0, NOTE_C5, 0,  NOTE_G5, 0,  NOTE_F5, 0,  NOTE_C5, 0, NOTE_A4, 0},
-  //4 Star Wars theme  ?????
+  // Star Wars theme
   {  NOTE_F4,  NOTE_F4, NOTE_F4,  NOTE_AS4,   NOTE_F5,  NOTE_DS5,  NOTE_D5,  NOTE_C5, NOTE_AS5, NOTE_F5, NOTE_DS5,  NOTE_D5,  NOTE_C5, NOTE_AS5, NOTE_F5, NOTE_DS5, NOTE_D5, NOTE_DS5,   NOTE_C5},
-  //5 Mario
+  // Mario
   { NOTE_E7, NOTE_E7, 0, NOTE_E7, 0, NOTE_C7, NOTE_E7, 0, NOTE_G7, 0, 0,  0, NOTE_G6, 0, 0, 0, NOTE_C7, 0, 0, NOTE_G6, 0, 0, NOTE_E6, 0, 0, NOTE_A6, 0, NOTE_B6, 0, NOTE_AS6, NOTE_A6, 0, NOTE_G6, NOTE_E7, NOTE_G7, NOTE_A7, 0, NOTE_F7, NOTE_G7, 0, NOTE_E7, 0, NOTE_C7, NOTE_D7, NOTE_B6, 0, 0, NOTE_C7, 0, 0, NOTE_G6, 0, 0, NOTE_E6, 0, 0, NOTE_A6, 0, NOTE_B6, 0, NOTE_AS6, NOTE_A6, 0, NOTE_G6, NOTE_E7, NOTE_G7, NOTE_A7, 0, NOTE_F7, NOTE_G7, 0, NOTE_E7, 0, NOTE_C7, NOTE_D7, NOTE_B6, 0, 0
   },
-  //6 Mario Underworld Melody
+  // Mario Underworld Melody
   { NOTE_C4, NOTE_C5, NOTE_A3, NOTE_A4, NOTE_AS3, NOTE_AS4, 0, 0, NOTE_C4, NOTE_C5, NOTE_A3, NOTE_A4, NOTE_AS3, NOTE_AS4, 0, 0, NOTE_F3, NOTE_F4, NOTE_D3, NOTE_D4, NOTE_DS3, NOTE_DS4, 0, 0, NOTE_F3, NOTE_F4, NOTE_D3, NOTE_D4, NOTE_DS3, NOTE_DS4, 0, 0, NOTE_DS4, NOTE_CS4, NOTE_D4, NOTE_CS4, NOTE_DS4, NOTE_DS4, NOTE_GS3, NOTE_G3, NOTE_CS4, NOTE_C4, NOTE_FS4, NOTE_F4, NOTE_E3, NOTE_AS4, NOTE_A4, NOTE_GS4, NOTE_DS4, NOTE_B3, NOTE_AS3, NOTE_A3, NOTE_GS3, 0, 0, 0
   },
 };
 
 // durations
-int noteDurations[][78] = {
-  {4,4,4,4,4},
+const int noteDurations[][78]PROGMEM = {
+  {4,4,4,4,4,4,4,4 },
   {
     6,12,4,4,4,2,
     6,12,4,4,4,2,
@@ -227,14 +229,14 @@ void loop() {
       Serial.print(" ");
       Serial.print(timeChange);
       //timeChange=0;
-      int noteDuration = 1000/(noteDurations[song][thisNote] + timeChange);
+      int noteDuration = 1000/(pgm_read_word(&(noteDurations[song][thisNote])) + timeChange);
       
-      int freqChange = map(freqVal, freqMin, freqMax, -20, 20);
+      int freqChange = map(freqVal, freqMin, freqMax, -50, 50);
       Serial.print(" ");
       Serial.print(freqChange);
       Serial.println();
       //freqChange=0;
-      buzz(speakerPin, melodies[song][thisNote] + freqChange, noteDuration);
+      buzz(speakerPin, pgm_read_word(&(melodies[song][thisNote])) + freqChange, noteDuration);
       
       // flash LEDs
       for (int i=0; i<nLeds; i++) {
